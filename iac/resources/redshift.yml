@@ -81,7 +81,7 @@ RedshiftServerlessWorkgroup:
 RedshiftAccessEC2:
   Type: AWS::EC2::Instance
   Properties:
-    ImageId: ami-0eb260c4d5475b901 # Ubuntu Server 22.04 LTS
+    ImageId: ami-0eb260c4d5475b901 # Ubuntu Server 22.04 LTS-P
     InstanceType: t2.nano
     SubnetId: !Ref SubnetForDAP1
     IamInstanceProfile: !Ref RedshiftAccessEC2InstanceProfile
