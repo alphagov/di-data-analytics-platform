@@ -20,7 +20,7 @@ npm run integration-test
 
 TESTS_EXIT_CODE=$?
 
-cp reports/testReport.xml $TEST_REPORT_ABSOLUTE_DIR/junit.xml
+cp test-report/index.html ./test-report/index.html
 
 if [ $TESTS_EXIT_CODE -ne 0 ]; then
   exit 1
