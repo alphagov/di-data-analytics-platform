@@ -1,7 +1,7 @@
 [
     {
         "product_family": "auth_account_creation",
-        "enabled": true
+        "enabled": false
     },
     {
         "product_family": "auth_orchestration",
