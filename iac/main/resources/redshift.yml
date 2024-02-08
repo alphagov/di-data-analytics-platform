@@ -75,8 +75,6 @@ RedshiftSecretRotationLambda:
   # checkov:skip=CKV_AWS_116: DLQ not needed
   Type: AWS::Serverless::Function
   Properties:
-    # todo remove this once secretsmanager permissions have been added to secure pipelines permissions boundary
-    PermissionsBoundary: !Ref AWS::NoValue
     FunctionName: redshift-rotate-secret
     Handler: redshift-rotate-secret.handler
     Policies:
