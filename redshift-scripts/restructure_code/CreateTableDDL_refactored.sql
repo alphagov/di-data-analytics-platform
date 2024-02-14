@@ -163,7 +163,7 @@ CREATE TABLE conformed_refactored.batch_events_refactored (
     event_name character varying(1000) ENCODE lzo,
     insert_timestamp timestamp without time zone ENCODE az64,
     max_run_date date ENCODE az64,
-    column event_active int default  1
+    event_active int default  1
 ) DISTSTYLE AUTO;
 
 --alter table "dap_txma_reporting_db_refactored"."conformed_refactored"."batch_events_refactored" 
