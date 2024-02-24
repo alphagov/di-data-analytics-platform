@@ -642,6 +642,7 @@ StepFunctionRedshiftProcessRole:
             - Effect: Allow
               Resource:
                 - !Sub 'arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${Environment}-dap-redshift-processing'
+                - !Sub 'arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:${Environment}-dap-stage-to-redshift-processing'
 
               Action:
                 - states:ListExecutions
@@ -820,3 +821,19 @@ DataQualityStageLayerOptimisedPythonGlueJob:
     SecurityConfiguration: !Ref GlueSecurityConfig
     Name: !Sub ${Environment}-dap-data-quality-new-stage-metrics-generation
     Role: !Ref GlueScriptsExecutionRole
+
+StageLayerToRedshiftProcessingStateMachine:
+  Type: AWS::Serverless::StateMachine # More info about State Machine Resource: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-statemachine.html
+  Properties:
+    DefinitionUri: statemachine/txma_consolidated_stage_layer_to_redshift_processing
+    Name: !Sub ${Environment}-dap-stage-to-redshift-processing
+    Role: !GetAtt StepFunctionRedshiftProcessRole.Arn
+    Logging:
+      Destinations:
+        - CloudWatchLogsLogGroup:
+            LogGroupArn: !GetAtt RedshiftProcessingLogGroup.Arn
+      IncludeExecutionData: true
+      Level: ALL
+    DefinitionSubstitutions:
+      RedshiftWorkgroup: !Ref RedshiftServerlessWorkgroup
+      RedshiftDatabaseName: dap_txma_reporting_db
