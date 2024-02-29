@@ -10,11 +10,14 @@ BEGIN
         (step_number,Procedure_name,running_status,procedure_start_date)
         values(5,'dim_relying_party_refactored_upsert','started',sysdate);
 
-INSERT INTO  conformed_refactored.dim_relying_party_refactored (CLIENT_ID, RELYING_PARTY_NAME, DISPLAY_NAME, CREATED_BY, CREATED_DATE, MODIFIED_BY, MODIFIED_DATE)
+INSERT INTO  conformed_refactored.dim_relying_party_refactored (CLIENT_ID, RELYING_PARTY_NAME, DISPLAY_NAME, department_name 
+                                                               ,agency_name,CREATED_BY, CREATED_DATE, MODIFIED_BY, MODIFIED_DATE)
 SELECT 
-CLIENT_ID
+ CLIENT_ID
 ,CLIENT_NAME
 ,DISPLAY_NAME
+,department_name
+,agency_name
 ,current_user
 ,CURRENT_DATE
 ,current_user
@@ -24,7 +27,9 @@ from
     NVL(st.CLIENT_ID, '-1') AS CLIENT_ID,
     st.CLIENT_NAME,
     st.DISPLAY_NAME,
-    st.partition_event_name
+    st.partition_event_name,
+    st.department_name,
+    st.agency_name
 FROM (
     SELECT * FROM (
         SELECT
@@ -36,6 +41,8 @@ FROM (
                 mn.processed_dt,
                 ref.CLIENT_NAME,
                 ref.DISPLAY_NAME,
+                ref.department_name,
+                ref.agency_name,
                 mn.partition_event_name,
                 current_user,
                 CURRENT_DATE,
@@ -62,12 +69,16 @@ AND bth.event_active =1;
 UPDATE conformed_refactored.dim_relying_party_refactored
     SET client_id=st.CLIENT_ID,
     relying_party_name=st.client_name,
-    display_name=st.display_name
+    display_name=st.display_name,
+    department_name=st.department_name,
+    agency_name=st.agency_name
     FROM 
     (SELECT 
     NVL(CLIENT_ID, '-1') AS CLIENT_ID,
     client_name,
-    display_name
+    display_name,
+    department_name,
+    agency_name
     FROM (
         SELECT
             ROW_NUMBER() OVER(PARTITION BY CLIENT_ID ORDER BY processed_dt DESC) AS ROW_NUMBER_Client_id,
@@ -78,6 +89,8 @@ UPDATE conformed_refactored.dim_relying_party_refactored
                 mn.processed_dt,
                 ref.CLIENT_NAME,
                 ref.DISPLAY_NAME,
+                ref.department_name,
+                ref.agency_name,
                 mn.partition_event_name,
                 current_user,
                 CURRENT_DATE,
@@ -90,8 +103,7 @@ UPDATE conformed_refactored.dim_relying_party_refactored
             and to_date(mn.processed_dt,'YYYYMMDD') >=  (SELECT NVL(MIN((max_run_date )),'1999-01-01')
                                                         FROM conformed_refactored.batch_events_refactored)
         )
-    ) WHERE ROW_NUMBER_Client_id = 1
-    )AS st
+    ) WHERE ROW_NUMBER_Client_id = 1)AS st
             WHERE dim_relying_party_refactored.Client_id = st.Client_id
             and dim_relying_party_refactored.relying_party_name<>st.client_name
             and dim_relying_party_refactored.display_name<>st.display_name;
@@ -100,6 +112,12 @@ UPDATE conformed_refactored.dim_relying_party_refactored
         update audit_refactored.audit_procedure_status
         set running_status='Complete'
         ,procedure_end_date=sysdate
-        where Procedure_name='dim_relying_party_refactored_upsert';                                                        
+        where Procedure_name='dim_relying_party_refactored_upsert';     
+
+    raise info 'dim Relying Party refactored update in conformed layer ran successfully';
+
+EXCEPTION WHEN OTHERS THEN 
+    RAISE EXCEPTION'[Error while dim Relying Party refactored update in conformed layer ] Exception: %',sqlerrm;
+
 END;
 $$ LANGUAGE plpgsql;    
