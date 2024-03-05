@@ -25,7 +25,7 @@ INSERT INTO  conformed_refactored.event_extensions_refactored ( user_journey_eve
         AND to_date(processed_dt,'YYYYMMDD') >= (SELECT NVL(MIN((max_run_date )),'1999-01-01')
                                                      FROM  conformed_refactored.batch_events_refactored) 
         AND bth.event_active =1                                                     
-        AND user_journey_event_key NOT IN (
+        AND user_journey_event_key  IN (
         SELECT user_journey_event_key
         FROM conformed_refactored.event_extensions_refactored) ;
 
