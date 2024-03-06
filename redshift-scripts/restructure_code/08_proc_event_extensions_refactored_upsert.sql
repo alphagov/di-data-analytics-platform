@@ -1,4 +1,5 @@
 CREATE OR REPLACE PROCEDURE conformed_refactored.event_extensions_refactored_upsert()
+ LANGUAGE plpgsql
 AS $$
 DECLARE
 BEGIN
@@ -25,7 +26,7 @@ INSERT INTO  conformed_refactored.event_extensions_refactored ( user_journey_eve
         AND to_date(processed_dt,'YYYYMMDD') >= (SELECT NVL(MIN((max_run_date )),'1999-01-01')
                                                      FROM  conformed_refactored.batch_events_refactored) 
         AND bth.event_active =1                                                     
-        AND user_journey_event_key  IN (
+        AND user_journey_event_key NOT IN (
         SELECT user_journey_event_key
         FROM conformed_refactored.event_extensions_refactored) ;
 
@@ -51,7 +52,7 @@ INSERT INTO  conformed_refactored.event_extensions_refactored ( user_journey_eve
         AND to_date(processed_dt,'YYYYMMDD') >= (SELECT NVL(MIN((max_run_date )),'1999-01-01')
                                                      FROM  conformed_refactored.batch_events_refactored) 
         AND bth.event_active =1                                                     
-        AND user_journey_event_key NOT IN (
+        AND user_journey_event_key IN (
         SELECT user_journey_event_key
         FROM conformed_refactored.event_extensions_refactored)     )AS st
     WHERE event_extensions_refactored.user_journey_event_key = st.user_journey_event_key ;  
@@ -73,4 +74,4 @@ INSERT INTO  conformed_refactored.event_extensions_refactored ( user_journey_eve
         where Procedure_name='event_extensions_refactored_upsert';  
 
 END;
-$$ LANGUAGE plpgsql;    
+$$
