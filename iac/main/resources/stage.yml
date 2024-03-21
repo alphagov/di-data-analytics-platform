@@ -18,11 +18,18 @@ StageLayerBucket:
         - ExpirationInDays: 365
           Status: Enabled
     NotificationConfiguration:
+      EventBridgeConfiguration:
+        EventBridgeEnabled: true
       LambdaConfigurations:
         - Event: s3:ObjectCreated:*
-          Function: !GetAtt S3NotificationsLoggerLambda.Arn
-        - Event: s3:ObjectRemoved:*
-          Function: !GetAtt S3NotificationsLoggerLambda.Arn
+          Function: !GetAtt S3SendMetadataLambda.Arn
+          Filter:
+            S3Key:
+              Rules:
+                - Name: prefix
+                  Value: reference-data/
+                - Name: suffix
+                  Value: .csv
 
 StageLayerBucketPolicy:
   Type: AWS::S3::BucketPolicy
@@ -142,6 +149,7 @@ AuthAccountUserLoginGlueTable:
           - { Name: timestamp, Type: int }
           - { Name: timestamp_formatted, Type: string }
           - { Name: extensions_isnewaccount, Type: string }
+          - { Name: extensions_testuser, Type: string }
           - { Name: year, Type: int }
           - { Name: month, Type: int }
           - { Name: day, Type: int }
@@ -381,6 +389,10 @@ IpvJourneyGlueTable:
           - { Name: extensions_evidence, Type: string }
           - { Name: extensions_age, Type: string }
           - { Name: extensions_isukissued, Type: string }
+          - { Name: event_timestamp_ms, Type: bigint }
+          - { Name: event_timestamp_ms_formatted, Type: string }
+          - { Name: extensions_mitigationtype, Type: string }
+          - { Name: extensions_reproveidentity, Type: string }
           - { Name: year, Type: int }
           - { Name: month, Type: int }
           - { Name: day, Type: int }
@@ -595,8 +607,8 @@ StageGlueCrawlerRole:
                 - 's3:PutObject'
                 - 's3:ListObject'
               Resource:
-                - !Sub 'arn:aws:s3:::${StageLayerBucket}'
-                - !Sub 'arn:aws:s3:::${StageLayerBucket}/*'
+                - !Sub 'arn:aws:s3:::${Environment}-dap-stage-layer'
+                - !Sub 'arn:aws:s3:::${Environment}-dap-stage-layer/*'
             - Effect: Allow
               Action: 'logs:AssociateKmsKey'
               Resource: 'arn:aws:logs:*:*:/aws-glue/*'

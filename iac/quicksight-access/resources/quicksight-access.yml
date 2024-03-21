@@ -1,3 +1,48 @@
+QuickSightLogBucket:
+  # checkov:skip=CKV_AWS_18: This is the log bucket to log quicksight access
+  Type: 'AWS::S3::Bucket'
+  Condition: IsQuicksightEnvironment
+  Properties:
+    AccessControl: Private
+    BucketName: !Sub '${Environment}-dap-quicksight-s3-logs'
+    PublicAccessBlockConfiguration:
+      BlockPublicAcls: true
+      BlockPublicPolicy: true
+      IgnorePublicAcls: true
+      RestrictPublicBuckets: true
+    VersioningConfiguration:
+      Status: Enabled
+    LifecycleConfiguration:
+      Rules:
+        - ExpirationInDays: 365
+          Status: Enabled
+
+QuickSightLogBucketBucketPolicy:
+  Type: AWS::S3::BucketPolicy
+  Condition: IsQuicksightEnvironment
+  Properties:
+    Bucket: !Ref QuickSightLogBucket
+    PolicyDocument:
+      Version: 2012-10-17
+      Statement:
+        - Effect: Deny
+          Action: 's3:*'
+          Resource: !Sub ${QuickSightLogBucket.Arn}/*
+          Principal: '*'
+          Condition:
+            Bool:
+              aws:SecureTransport: false
+        - Effect: Allow
+          Action:
+            - 's3:GetObject'
+            - 's3:PutObject'
+            - 's3:ListBucket'
+          Resource:
+            - !Sub ${QuickSightLogBucket.Arn}
+            - !Sub ${QuickSightLogBucket.Arn}/*
+          Principal:
+            AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+
 QuicksightAccessLambdaFunction:
   # checkov:skip=CKV_AWS_116: DLQ not needed as credentials would be out of date when retried
   Type: AWS::Serverless::Function
@@ -142,6 +187,7 @@ QuicksightAddUsersLambdaFunction:
             Action:
               - quicksight:CreateGroupMembership
               - quicksight:DescribeUser
+              - quicksight:ListGroups
               - quicksight:ListUserGroups
               - quicksight:RegisterUser
             Resource: '*'
@@ -207,12 +253,12 @@ QuicksightAddUsersFromSpreadsheetLambdaFunction:
         - Fn::ImportValue: !Sub ${Environment}-dap-vpc-ProtectedSubnetIdB
         - Fn::ImportValue: !Sub ${Environment}-dap-vpc-ProtectedSubnetIdC
 
-# Role to allow invoking the two quicksight add users lambdas (quicksight-add-users and quicksight-add-users-from-spreadsheet) from GitHub Actions
-QuicksightAddUsersLambdasInvokeRole:
+# Role to allow invoking quicksight utility lambdas (quicksight-add-users, quicksight-add-users-from-spreadsheet, quicksight-import and quicksight-export) from GitHub Actions
+QuicksightLambdasInvokeRole:
   Type: AWS::IAM::Role
   Condition: IsQuicksightEnvironment
   Properties:
-    RoleName: !Sub ${Environment}-dap-quicksight-add-users-lambdas-invoke-role
+    RoleName: !Sub ${Environment}-dap-quicksight-lambdas-invoke-role
     AssumeRolePolicyDocument:
       Version: 2012-10-17
       Statement:
@@ -235,12 +281,15 @@ QuicksightAddUsersLambdasInvokeRole:
               Resource:
                 - !GetAtt QuicksightAddUsersLambdaFunction.Arn
                 - !GetAtt QuicksightAddUsersFromSpreadsheetLambdaFunction.Arn
+                - !GetAtt QuicksightImportLambdaFunction.Arn
+                - !GetAtt QuicksightExportLambdaFunction.Arn
 
 webAcl:
   Type: 'AWS::WAFv2::WebACL'
   Condition: IsQuicksightEnvironment
   Properties:
     Description: Web ACL
+    Name: DAP-WebACL
     DefaultAction:
       Allow: {}
 
@@ -438,3 +487,41 @@ WAFLoggingKmsKey:
           Condition:
             ArnLike:
               'kms:EncryptionContext:aws:logs:arn': !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*'
+
+DAPAnalystsAssetsBucket:
+  Type: 'AWS::S3::Bucket'
+  Condition: IsQuicksightEnvironment
+  Properties:
+    AccessControl: Private
+    BucketName: !Sub '${Environment}-dap-analysts-assets'
+    LoggingConfiguration:
+      DestinationBucketName: !Ref QuickSightLogBucket
+      LogFilePrefix: dap-analysts-assets/log
+    PublicAccessBlockConfiguration:
+      BlockPublicAcls: true
+      BlockPublicPolicy: true
+      IgnorePublicAcls: true
+      RestrictPublicBuckets: true
+    VersioningConfiguration:
+      Status: Enabled
+    LifecycleConfiguration:
+      Rules:
+        - ExpirationInDays: 365
+          Status: Enabled
+
+DAPAnalystsAssetsBucketPolicy:
+  Type: AWS::S3::BucketPolicy
+  Condition: IsQuicksightEnvironment
+  Properties:
+    Bucket: !Ref DAPAnalystsAssetsBucket
+    PolicyDocument:
+      Version: 2012-10-17
+      Statement:
+        - Sid: DenyNonSSLAccess
+          Effect: Deny
+          Action: 's3:*'
+          Resource: !Sub ${DAPAnalystsAssetsBucket.Arn}/*
+          Principal: '*'
+          Condition:
+            Bool:
+              aws:SecureTransport: false

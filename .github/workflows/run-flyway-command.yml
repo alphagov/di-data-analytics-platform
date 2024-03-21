@@ -12,12 +12,11 @@ on:
         type: choice
         required: true
         description: Flyway command to run
-        options: [info, migrate, validate]
+        options: [info, migrate, validate, clean]
       database:
         type: string
-        required: false
-        description: Database on which to perform migrations (defaults to dap_txma_reporting_db)
-        default: unset
+        required: true
+        description: Database on which to perform migrations
 
 jobs:
   validate-environment:
@@ -28,8 +27,27 @@ jobs:
       - name: Validate input environment
         run: scripts/validate-environment.sh ${{ inputs.environment }}
 
+  validate-database:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Validate input database
+        run: scripts/validate-migration-database.sh ${{ inputs.database }}
+
+  upload-flyway-files:
+    needs: [validate-environment, validate-database]
+    # These permissions are needed to interact with GitHub's OIDC Token endpoint (enabling the aws-actions/configure-aws-credentials action)
+    permissions:
+      id-token: write
+      contents: read
+    secrets: inherit
+    uses: ./.github/workflows/upload-flyway-files.yml
+    with:
+      environment: ${{ inputs.environment }}
+
   run-flyway:
-    needs: [validate-environment]
+    needs: [upload-flyway-files]
     # These permissions are needed to interact with GitHub's OIDC Token endpoint (enabling the aws-actions/configure-aws-credentials action)
     permissions:
       id-token: write
@@ -45,8 +63,7 @@ jobs:
           role-to-assume: ${{ secrets[format('DB_MIGRATION_ROLE_ARN_{0}', inputs.environment)] }}
       - name: Invoke lambda
         run: |
-          DATABASE=$(if [ -z ${{ inputs.database }} ] || [ ${{ inputs.database }} == "unset" ]; then echo dap_txma_reporting_db; else echo ${{ inputs.database }}; fi)
-          PAYLOAD=$(echo "{\"command\": \"${{ inputs.command }}\", \"database\": \"$DATABASE\"}")
+          PAYLOAD=$(echo "{\"command\": \"${{ inputs.command }}\", \"database\": \"${{ inputs.database }}\"}")
           echo "$PAYLOAD" | jq
           ENCODED=$(echo "$PAYLOAD" | openssl base64)
           aws --region eu-west-2 lambda invoke --function-name run-flyway-command --payload "$ENCODED" out.json

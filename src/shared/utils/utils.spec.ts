@@ -3,6 +3,7 @@ import {
   decodeObject,
   encodeObject,
   ensureDefined,
+  findOrThrow,
   getAccountId,
   getAWSEnvironment,
   getEnvironmentVariable,
@@ -62,6 +63,16 @@ test('get required params errors if field present but null or undefined', () => 
   const presentButUndefined = { Bucket: 'bucket-name', Prefix: undefined };
   expect(() => getRequiredParams(presentButUndefined, 'Bucket', 'Prefix')).toThrow(
     'Object is missing the following required fields: Prefix',
+  );
+});
+
+test('get required params errors if object is null or undefined', () => {
+  expect(() => getRequiredParams(null as unknown as Record<string, unknown>, 'Bucket')).toThrow(
+    'Object is null or undefined',
+  );
+
+  expect(() => getRequiredParams(undefined as unknown as Record<string, unknown>, 'Bucket')).toThrow(
+    'Object is null or undefined',
   );
 });
 
@@ -176,6 +187,13 @@ test('ensure defined', () => {
   const response = { one: 'one', two: undefined };
   expect(ensureDefined(() => response.one)).toEqual('one');
   expect(() => ensureDefined(() => response.two)).toThrow('two is undefined');
+});
+
+test('find or throw', () => {
+  expect(findOrThrow([1, 2, 3, 4], n => n === 2)).toEqual(2);
+  expect(() => findOrThrow([1, 2, 3, 4], n => n === 8)).toThrow(
+    'Unable to find element matching predicate (n) => n === 8',
+  );
 });
 
 const mockS3Response = (body: unknown): GetObjectCommandOutput => {

@@ -21,6 +21,10 @@ export const getRequiredParams = <T extends Record<string, any>, K extends keyof
   t: T,
   ...requiredParams: K[]
 ): Required<Pick<T, K>> => {
+  if (t === null || t === undefined) {
+    throw new Error('Object is null or undefined');
+  }
+
   const missingFields = requiredParams.filter(field => !(field in t) || t[field] === null || t[field] === undefined);
   if (missingFields.length !== 0) {
     throw new Error(`Object is missing the following required fields: ${missingFields.join(', ')}`);
@@ -127,6 +131,10 @@ export const ensureDefined = (supplier: () => string | undefined): string => {
     throw new Error(`${key} is undefined`);
   }
   return value;
+};
+
+export const findOrThrow = <T>(ts: T[], predicate: (value: T, index: number, obj: T[]) => unknown): T => {
+  return ts.find(predicate) ?? throwExpression(`Unable to find element matching predicate ${predicate.toString()}`);
 };
 
 // see https://stackoverflow.com/a/65666402

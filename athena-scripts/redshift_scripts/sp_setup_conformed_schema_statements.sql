@@ -94,7 +94,9 @@ BEGIN
     ('IPV_SPOT_REQUEST_VALIDATION_FAILURE','IPV_JOURNEY','IPV','SPOT',' '),
     ('IPV_VC_RECEIVED','IPV_JOURNEY','IPV','IPV Journey',' '),
     ('AUTH_DOC_APP_AUTHORISATION_REQUESTED','AUTH_ORCHESTRATION','Authentication','Relying Parties Connect',' '),
-    ('IPV_MITIGATION_START','IPV_JOURNEY','IPV','Contra-Indicator',' ');
+    ('IPV_MITIGATION_START','IPV_JOURNEY','IPV','Contra-Indicator',' '),
+    ('AUTH_AUTHENTICATION_COMPLETE','AUTH_ACCOUNT_USER_LOGIN','Authentication','User Login',' '),
+    ('AUTH_PASSWORD_RESET_REQUESTED','AUTH_ACCOUNT_MANAGEMENT','Authentication','Account Management',' ');
 
 
     --
@@ -127,7 +129,8 @@ INSERT INTO conformed.REF_RELYING_PARTIES(CLIENT_ID,CLIENT_NAME,DISPLAY_NAME)
 ('FakIq5aYsHQ02dBOc6XwyA1wRRs',	'Great British Insulation Scheme (GBIS)','Ofgem - Great British Insulation Scheme (GBIS)'),
 ('2nAxHa72OqhE6eKymHZIx-sV3vI',	'Apprenticeship provider and assessment register service','NAS - Apprenticeship Provider and Assessment Register Service'),
 ('MJ8nBsh32LHweUjb6x3p7qf-_TE',	'Apprenticeship assessment service','NAS - Apprenticeship Assessment Service'),
-('txsGLvMYYCPaWPZRq2L7XxEnyro',	'Early Years Child Development Training','DFE - Early Years Child Development Training');
+('txsGLvMYYCPaWPZRq2L7XxEnyro',	'Early Years Child Development Training','DFE - Early Years Child Development Training'),
+('mQDXGO7gWdK7V28v82nVcEGuacY',	'HMRC','HMRC - HMRC');
 
 
     raise info 'Setup of conformed layer ran successfully';
