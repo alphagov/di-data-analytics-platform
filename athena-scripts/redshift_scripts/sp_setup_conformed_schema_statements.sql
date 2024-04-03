@@ -96,7 +96,8 @@ BEGIN
     ('AUTH_DOC_APP_AUTHORISATION_REQUESTED','AUTH_ORCHESTRATION','Authentication','Relying Parties Connect',' '),
     ('IPV_MITIGATION_START','IPV_JOURNEY','IPV','Contra-Indicator',' '),
     ('AUTH_AUTHENTICATION_COMPLETE','AUTH_ACCOUNT_USER_LOGIN','Authentication','User Login',' '),
-    ('AUTH_PASSWORD_RESET_REQUESTED','AUTH_ACCOUNT_MANAGEMENT','Authentication','Account Management',' ');
+    ('AUTH_PASSWORD_RESET_REQUESTED','AUTH_ACCOUNT_MANAGEMENT','Authentication','Account Management',' '),
+    ('HOME_REPORT_SUSPICIOUS_ACTIVITY','AUTH_ACCOUNT_MANAGEMENT','Authentication','Account Management',' ');
 
 
     --
@@ -131,7 +132,9 @@ INSERT INTO conformed.REF_RELYING_PARTIES(CLIENT_ID,CLIENT_NAME,DISPLAY_NAME)
 ('MJ8nBsh32LHweUjb6x3p7qf-_TE',	'Apprenticeship assessment service','NAS - Apprenticeship Assessment Service'),
 ('txsGLvMYYCPaWPZRq2L7XxEnyro',	'Early Years Child Development Training','DFE - Early Years Child Development Training'),
 ('mQDXGO7gWdK7V28v82nVcEGuacY',	'HMRC','HMRC - HMRC'),
-('DVUDWXsy0io7wDBH5LA5IEkEH5U',	'Plan Your Future','PYF - Plan Your Future');
+('DVUDWXsy0io7wDBH5LA5IEkEH5U',	'Plan Your Future','PYF - Plan Your Future'),
+('9uEx86ZHEp8ycgdHNqC8VK87E1A',	'Find and Use an API','DFE - Find and Use an API'),
+('tPCCSyoMaFNbLTt0gEW609h15Uc',	'Fisheries Permit','MF - Fisheries Permit');
 
 
     raise info 'Setup of conformed layer ran successfully';
