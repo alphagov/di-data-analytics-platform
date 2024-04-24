@@ -27,4 +27,7 @@ INSERT INTO conformed_refactored.REF_RELYING_PARTIES_refactored(CLIENT_ID,CLIENT
 ('2nAxHa72OqhE6eKymHZIx-sV3vI',	'Apprenticeship provider and assessment register service','NAS - Apprenticeship Provider and Assessment Register Service','DFE','NAS'),
 ('MJ8nBsh32LHweUjb6x3p7qf-_TE',	'Apprenticeship assessment service','NAS - Apprenticeship Assessment Service','DFE','NAS'),
 ('txsGLvMYYCPaWPZRq2L7XxEnyro',	'Early Years Child Development Training','DFE - Early Years Child Development Training','DFE','DFE'),
-('mQDXGO7gWdK7V28v82nVcEGuacY',	'HMRC','HMRC - HMRC','HMRC','HMRC');
+('mQDXGO7gWdK7V28v82nVcEGuacY',	'HMRC','HMRC - HMRC','HMRC','HMRC'),
+('DVUDWXsy0io7wDBH5LA5IEkEH5U',	'Plan Your Future','PYF - Plan Your Future','MOJ','PYF'),
+('9uEx86ZHEp8ycgdHNqC8VK87E1A',	'Find and Use an API','DFE - Find and Use an API','DFE','DFE'),
+('tPCCSyoMaFNbLTt0gEW609h15Uc',	'Fisheries Permit','MF - Fisheries Permit','WG','MF');
