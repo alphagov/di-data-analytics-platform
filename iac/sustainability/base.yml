@@ -23,11 +23,11 @@ Parameters:
     Type: String
     Default: none
 
-  TestRoleArn:
-    Type: String
-    Description: The ARN of the role that will used by secure pipelines to run integration tests
-    Default: none
-    AllowedPattern: (none)|(arn:aws:iam::.*:role/.*)
+  # TestRoleArn:
+  #   Type: String
+  #   Description: The ARN of the role that will used by secure pipelines to run integration tests
+  #   Default: none
+  #   AllowedPattern: (none)|(arn:aws:iam::.*:role/.*)
   VpcStackName:
     Type: String
     Description: The name of the stack containing the VPC
