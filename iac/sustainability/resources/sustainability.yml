@@ -146,9 +146,9 @@ SendReplicationFailureAlertsLambda:
       #   - !Ref SubnetForDAP3
       #         VpcConfig:
       SubnetIds:
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdA
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdB
-          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdC
+        - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdA
+        - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdB
+        - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdC
 
 s3Permission:
   Type: AWS::Lambda::Permission

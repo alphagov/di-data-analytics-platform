@@ -39,7 +39,6 @@ Parameters:
     Description: The name of the stack containing the VPC
     Default: none
 
-
 Conditions:
   UseCodeSigning: !Not
     - !Equals
