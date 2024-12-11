@@ -137,7 +137,7 @@ jobs:
       - name: Build lambdas
         run: npm run build
       - name: Build SAM template
-        run: npm run iac:build -- main
+        run: npm run iac:build -- sustainability
       - name: SAM setup
         uses: aws-actions/setup-sam@v2
         with:

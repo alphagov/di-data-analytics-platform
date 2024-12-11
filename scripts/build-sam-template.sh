@@ -2,8 +2,8 @@
 
 APP_NAME=$1
 
-if [ -z "$APP_NAME" ] || { [ "$APP_NAME" != "main" ] && [ "$APP_NAME" != "quicksight-access" ]; }; then
-  echo "App name must be provided and be one of 'main' or 'quicksight-access'"
+if [ -z "$APP_NAME" ] || { [ "$APP_NAME" != "main" ] && [ "$APP_NAME" != "quicksight-access" ] && [ "$APP_NAME" != "sustainability" ]; }; then
+  echo "App name must be provided and be one of 'main' or 'quicksight-access' or 'sustainability"
   echo "Usage (bash): build-sam-templates.sh APP_NAME"
   echo "Usage (npm): npm run iac:build -- APP_NAME"
   exit 1
