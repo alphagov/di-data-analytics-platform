@@ -140,10 +140,15 @@ SendReplicationFailureAlertsLambda:
     VpcConfig:
       SecurityGroupIds:
         - !Ref LambdaSecurityGroup
+      # SubnetIds:
+      #   - !Ref SubnetForDAP1
+      #   - !Ref SubnetForDAP2
+      #   - !Ref SubnetForDAP3
+      #         VpcConfig:
       SubnetIds:
-        - !Ref SubnetForDAP1
-        - !Ref SubnetForDAP2
-        - !Ref SubnetForDAP3
+          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdA
+          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdB
+          - Fn::ImportValue: !Sub ${VpcStackName}-PrivateSubnetIdC
 
 s3Permission:
   Type: AWS::Lambda::Permission
