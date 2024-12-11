@@ -213,9 +213,9 @@ ChatbotRole:
   Type: AWS::IAM::Role
   Properties:
     PermissionsBoundary: !If
-        - UsePermissionsBoundary
-        - !Ref PermissionsBoundary
-        - !Ref AWS::NoValue
+      - UsePermissionsBoundary
+      - !Ref PermissionsBoundary
+      - !Ref AWS::NoValue
     AssumeRolePolicyDocument:
       Version: '2012-10-17'
       Statement:
