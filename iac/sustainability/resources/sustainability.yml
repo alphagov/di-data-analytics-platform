@@ -4,7 +4,8 @@ SustainabilityBucket:
     AccessControl: Private
     BucketName: !Sub ${Environment}-dap-sustainability
     LoggingConfiguration:
-      DestinationBucketName: !Ref GlobalLogBucket
+      #DestinationBucketName: !Ref GlobalLogBucket
+      DestinationBucketName: !Sub '${Environment}-dap-s3-logs'
       LogFilePrefix: dap-sustainability/log
     PublicAccessBlockConfiguration:
       BlockPublicAcls: true
@@ -54,16 +55,16 @@ SustainabilityBucketPolicy:
           Condition:
             Bool:
               aws:SecureTransport: false
-        - Effect: Allow
-          Action:
-            - 's3:PutObject'
-            - 's3:GetBucketLocation'
-            - 's3:ListBucket'
-          Resource:
-            - !Sub ${SustainabilityBucket.Arn}
-            - !Sub ${SustainabilityBucket.Arn}/*
-          Principal:
-            AWS: !GetAtt IAMRoleRedshiftServerless.Arn
+        # - Effect: Allow
+        #   Action:
+        #     - 's3:PutObject'
+        #     - 's3:GetBucketLocation'
+        #     - 's3:ListBucket'
+        #   Resource:
+        #     - !Sub ${SustainabilityBucket.Arn}
+        #     - !Sub ${SustainabilityBucket.Arn}/*
+        #   Principal:
+        #     AWS: !GetAtt IAMRoleRedshiftServerless.Arn
 
 SustainabilityBucketIamPolicy:
   Type: 'AWS::IAM::Policy'
@@ -117,13 +118,14 @@ SendReplicationFailureAlertsLambda:
               - kms:Decrypt
               - kms:GenerateDataKey*
               - kms:Encrypt
-            Resource: !GetAtt KmsKey.Arn
-          - Effect: Allow
-            Action:
-              - kms:Decrypt
-              - kms:GenerateDataKey*
-              - kms:Encrypt
-            Resource: !GetAtt BuildNotificationTopicKey.Arn
+            #Resource: !GetAtt KmsKey.Arn
+            Resource: '*'
+          # - Effect: Allow
+          #   Action:
+          #     - kms:Decrypt
+          #     - kms:GenerateDataKey*
+          #     - kms:Encrypt
+          #   Resource: !GetAtt BuildNotificationTopicKey.Arn
           - Effect: Allow
             Action:
               - 'sns:Publish'
@@ -139,7 +141,7 @@ SendReplicationFailureAlertsLambda:
       Environment: !Ref Environment
     VpcConfig:
       SecurityGroupIds:
-        - !Ref LambdaSecurityGroup
+        - Fn::ImportValue: !Sub ${VpcStackName}-AWSServicesEndpointSecurityGroupId
       # SubnetIds:
       #   - !Ref SubnetForDAP1
       #   - !Ref SubnetForDAP2

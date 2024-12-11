@@ -23,12 +23,6 @@ Parameters:
     Type: String
     Default: none
 
-  BuildAccountId:
-    Default: 991664831801
-    Type: String
-    Description: Account number of the build account used to grant it S3 access in other accounts
-    AllowedValues:
-      - 991664831801
   TestRoleArn:
     Type: String
     Description: The ARN of the role that will used by secure pipelines to run integration tests
@@ -48,37 +42,23 @@ Conditions:
     - !Equals
       - !Ref PermissionsBoundary
       - none
-  UseTestingContainers: !Not
-    - !Equals
-      - !Ref TestRoleArn
-      - none
-  IsDev: !Equals [!Ref Environment, dev]
-  IsBuild: !Equals [!Ref Environment, build]
-  IsIntegration: !Equals [!Ref Environment, integration]
-  IsStaging: !Equals [!Ref Environment, staging]
-  IsProduction: !Equals [!Ref Environment, production]
-  IsProductionPreview: !Equals [!Ref Environment, production-preview]
-  IsQuicksightEnvironment: !Or
-    - !Condition IsDev
-    - !Condition IsProduction
-    - !Condition IsProductionPreview
-  IsCrossAccountDataSyncEnvironment: !Or
-    - !Condition IsStaging
-    - !Condition IsProductionPreview
-  UsePlaceholderTxMAQueue:
-    !Or # todo replace line below with `- !Condition IsDev` when txma queue has been moved from dev to staging
-    - !Condition IsStaging
-    - !Condition IsBuild
-    - !Condition IsProductionPreview
+  # UseTestingContainers: !Not
+  #   - !Equals
+  #     - !Ref TestRoleArn
+  #     - none
+  # IsDev: !Equals [!Ref Environment, dev]
+  # IsBuild: !Equals [!Ref Environment, build]
+  # IsIntegration: !Equals [!Ref Environment, integration]
+  # IsStaging: !Equals [!Ref Environment, staging]
+  # IsProduction: !Equals [!Ref Environment, production]
+  # IsProductionPreview: !Equals [!Ref Environment, production-preview]
+
   # is this an environment that uses secure pipelines for deployments (production-preview does a direct sam deploy)
   # used to determine if extra policies need to be added to the secure pipelines deploy role in pipeline.yml
-  IsSecurePipelinesEnvironment: !Not [!Condition IsProductionPreview]
-  IsManualReferenceDataEnvironment: !Or
-    - !Condition IsProduction
-    - !Condition IsProductionPreview
-  IsADMEnvironment: !Or
-    - !Condition IsProduction
-    - !Condition IsProductionPreview
+  # IsSecurePipelinesEnvironment: !Not [!Condition IsProductionPreview]
+  # IsManualReferenceDataEnvironment: !Or
+  #   - !Condition IsProduction
+  #   - !Condition IsProductionPreview
 
 Globals:
   Function:
