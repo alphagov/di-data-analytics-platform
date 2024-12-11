@@ -14,10 +14,10 @@ SustainabilityBucket:
       RestrictPublicBuckets: true
     VersioningConfiguration:
       Status: Enabled
-    NotificationConfiguration:
-      LambdaConfigurations:
-        - Function: !GetAtt SendReplicationFailureAlertsLambda.Arn
-          Event: s3:Replication:*
+    # NotificationConfiguration:
+    #   LambdaConfigurations:
+    #     - Function: !GetAtt SendReplicationFailureAlertsLambda.Arn
+    #       Event: s3:Replication:*
     LifecycleConfiguration:
       # Permanently removing files after 40 days
       Rules:
