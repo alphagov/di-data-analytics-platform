@@ -127,24 +127,22 @@ CurHourlyTable:
               Type: STRING
             - Name: bill_billing_entity
               Type: STRING
-            - Name: identity_line_item_id
-              Type: STRING
             - Name: bill_bill_type
               Type: STRING
             - Name: bill_payer_account_id
               Type: STRING
             - Name: bill_billing_period_start_date
-              Type: STRING
+              Type: TIMESTAMP
             - Name: bill_billing_period_end_date
-              Type: STRING
+              Type: TIMESTAMP
             - Name: line_item_usage_account_id
               Type: STRING
             - Name: line_item_line_item_type
               Type: STRING
             - Name: line_item_usage_start_date
-              Type: STRING 
+              Type: TIMESTAMP 
             - Name: line_item_usage_end_date
-              Type: STRING
+              Type: TIMESTAMP
             - Name: line_item_product_code
               Type: STRING
             - Name: line_item_usage_type
@@ -156,21 +154,21 @@ CurHourlyTable:
             - Name: line_item_resource_id
               Type: STRING
             - Name: line_item_usage_amount
-              Type: STRING
+              Type: DOUBLE
             - Name: line_item_normalization_factor
-              Type: STRING
+              Type: DOUBLE
             - Name: line_item_normalized_usage_amount
-              Type: STRING
+              Type: DOUBLE
             - Name: line_item_currency_code
               Type: STRING
             - Name: line_item_unblended_rate
               Type: STRING
             - Name: line_item_unblended_cost
-              Type: STRING
+              Type: DOUBLE
             - Name: line_item_blended_rate
               Type: STRING
             - Name: line_item_blended_cost
-              Type: STRING
+              Type: DOUBLE
             - Name: line_item_line_item_description
               Type: STRING
             - Name: line_item_tax_type
@@ -352,7 +350,7 @@ CurHourlyTable:
             - Name: pricing_currency
               Type: STRING
             - Name: pricing_public_on_demand_cost
-              Type: STRING
+              Type: DOUBLE
             - Name: pricing_public_on_demand_rate
               Type: STRING
             - Name: pricing_term
@@ -360,11 +358,11 @@ CurHourlyTable:
             - Name: pricing_unit
               Type: STRING
             - Name: reservation_amortized_upfront_cost_for_usage
-              Type: STRING
+              Type: DOUBLE
             - Name: reservation_amortized_upfront_fee_for_billing_period
-              Type: STRING
+              Type: DOUBLE
             - Name: reservation_effective_cost
-              Type: STRING
+              Type: DOUBLE
             - Name: reservation_end_time
               Type: STRING
             - Name: reservation_modification_status
@@ -374,7 +372,7 @@ CurHourlyTable:
             - Name: reservation_number_of_reservations
               Type: STRING
             - Name: reservation_recurring_fee_for_usage
-              Type: STRING
+              Type: DOUBLE
             - Name: reservation_start_time
               Type: STRING
             - Name: reservation_subscription_id
@@ -386,32 +384,37 @@ CurHourlyTable:
             - Name: reservation_units_per_reservation
               Type: STRING
             - Name: reservation_unused_amortized_upfront_fee_for_billing_period
-              Type: STRING
+              Type: DOUBLE
             - Name: reservation_unused_normalized_unit_quantity
-              Type: STRING
+              Type: DOUBLE
             - Name: reservation_unused_quantity
-              Type: STRING   
-            - Name: reservation_normalized_units_per_reservation
-              Type: STRING   
-            - Name: reservation_number_of_reservations
+              Type: DOUBLE   
+            - Name: reservation_unused_recurring_fee
+              Type: DOUBLE   
+            - Name: reservation_upfront_value
+              Type: DOUBLE
+            - Name: savings_plan_total_commitment_to_date
+              Type: DOUBLE
+            - Name: savings_plan_savings_plan_a_r_n
               Type: STRING
-            - Name: reservation_recurring_fee_for_usage
+            - Name: savings_plan_savings_plan_rate
+              Type: DOUBLE
+            - Name: savings_plan_used_commitment
+              Type: DOUBLE     
+            - Name: savings_plan_savings_plan_effective_cost
+              Type: DOUBLE
+            - Name: savings_plan_amortized_upfront_commitment_for_billing_period
+              Type: DOUBLE
+            - Name: savings_plan_recurring_commitment_for_billing_period
+              Type: DOUBLE
+            - Name: resource_tags_aws_cloudformation_logical_id
               Type: STRING
-            - Name: reservation_start_time
+            - Name: resource_tags_aws_cloudformation_stack_id   
               Type: STRING
-            - Name: reservation_subscription_id
+            - Name: resource_tags_aws_cloudformation_stack_name
               Type: STRING
-            - Name: reservation_total_reserved_normalized_units
-              Type: STRING     
-            - Name: reservation_total_reserved_units
-              Type: STRING
-            - Name: reservation_units_per_reservation
-              Type: STRING
-            - Name: reservation_unused_amortized_upfront_fee_for_billing_period
-              Type: STRING
-            - Name: reservation_unused_normalized_unit_quantity
-              Type: STRING
-            - Name: product_standard_storage_retention_included                                    
+            - Name: resource_tags_user_name
+              Type: STRING                                                                  
           InputFormat: PARQUET
           OutputFormat: PARQUET
           SerdeInfo:
@@ -420,6 +423,13 @@ CurHourlyTable:
           StoredAsSubDirectories: false
           Parameters:
             classification: parquet
+          Location: !Sub s3://${SustainabilityBucket}/cid-921370741319-shared/cur/892537467220/cid/ # Assuming 'DataBucket', 'ReportPathPrefix', and 'ReportName' are defined elsewhere
+          InputFormat: org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat
+          OutputFormat: org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat
+          SerdeInfo:
+            SerializationLibrary: org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
+          Parameters:
+            serialization.format: 1
         PartitionKeys:
           - Name: year
             Type: int
@@ -434,33 +444,5 @@ CurHourlyTable:
           "projection.year.range": "2018,2024"
           "projection.month.type": "integer"
           "projection.month.range": "1,12" 
-      StorageDescriptor:
-        Location: !Sub s3://${SustainabilityBucket}/cid-921370741319-shared/cur/892537467220/cid/ # Assuming 'DataBucket', 'ReportPathPrefix', and 'ReportName' are defined elsewhere
-        InputFormat: org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat
-        OutputFormat: org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat
-        SerdeInfo:
-          SerializationLibrary: org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
-          Parameters:
-            serialization.format: 1
+  
 
-SustainabilityGlueTable:
-  Type: AWS::Glue::Table
-  Properties:
-    CatalogId: !Sub ${AWS::AccountId}
-    DatabaseName: !Ref SustainabilityDatabase
-    TableInput:
-      Name: cur_hourly
-      PartitionKeys:
-        - { Name: year, Type: string }
-        - { Name: month, Type: string }
-        - { Name: day, Type: string }
-      StorageDescriptor:
-        Columns:
-          - { Name: event_id, Type: string }
-        InputFormat: org.apache.hadoop.mapred.TextInputFormat
-        Location: !Sub s3://${SustainabilityBucket}/cid-921370741319-shared/cur/892537467220/cid/
-        OutputFormat: org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
-        SerdeInfo:
-          Parameters:
-            serialiazation.format: 1
-          SerializationLibrary: org.openx.data.jsonserde.JsonSerDe
